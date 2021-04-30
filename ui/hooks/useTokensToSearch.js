@@ -7,11 +7,12 @@ import { checksumAddress } from '../helpers/utils/util';
 import { getTokenFiatAmount } from '../helpers/utils/token-util';
 import {
   getTokenExchangeRates,
-  getConversionRate,
   getCurrentCurrency,
   getSwapsDefaultToken,
   getCurrentChainId,
 } from '../selectors';
+import { getConversionRate } from '../ducks/metamask/metamask';
+
 import { getSwapsTokens } from '../ducks/swaps/swaps';
 import { isSwapsDefaultTokenSymbol } from '../../shared/modules/swaps.utils';
 import { useEqualityCheck } from './useEqualityCheck';

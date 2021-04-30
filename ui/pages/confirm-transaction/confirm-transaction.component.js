@@ -34,7 +34,7 @@ export default class ConfirmTransaction extends Component {
   static propTypes = {
     history: PropTypes.object.isRequired,
     totalUnapprovedCount: PropTypes.number.isRequired,
-    send: PropTypes.object,
+    sendTo: PropTypes.string,
     setTransactionToConfirm: PropTypes.func,
     clearConfirmTransaction: PropTypes.func,
     fetchBasicGasEstimates: PropTypes.func,
@@ -50,7 +50,7 @@ export default class ConfirmTransaction extends Component {
   componentDidMount() {
     const {
       totalUnapprovedCount = 0,
-      send = {},
+      sendTo,
       history,
       mostRecentOverviewPage,
       transaction: { txParams: { data, to } = {} } = {},
@@ -62,7 +62,7 @@ export default class ConfirmTransaction extends Component {
       isTokenMethodAction,
     } = this.props;
 
-    if (!totalUnapprovedCount && !send.to) {
+    if (!totalUnapprovedCount && !sendTo) {
       history.replace(mostRecentOverviewPage);
       return;
     }

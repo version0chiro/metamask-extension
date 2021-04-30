@@ -8,7 +8,7 @@ describe('SendHeader Component', () => {
   let wrapper;
 
   const propsMethodSpies = {
-    clearSend: sinon.spy(),
+    resetSendState: sinon.spy(),
   };
   const historySpies = {
     push: sinon.spy(),
@@ -21,7 +21,7 @@ describe('SendHeader Component', () => {
   beforeEach(() => {
     wrapper = shallow(
       <SendHeader
-        clearSend={propsMethodSpies.clearSend}
+        resetSendState={propsMethodSpies.resetSendState}
         history={historySpies}
         mostRecentOverviewPage="mostRecentOverviewPage"
         titleKey="mockTitleKey"
@@ -31,7 +31,7 @@ describe('SendHeader Component', () => {
   });
 
   afterEach(() => {
-    propsMethodSpies.clearSend.resetHistory();
+    propsMethodSpies.resetSendState.resetHistory();
     historySpies.push.resetHistory();
     SendHeader.prototype.onClose.resetHistory();
   });
@@ -41,10 +41,10 @@ describe('SendHeader Component', () => {
   });
 
   describe('onClose', () => {
-    it('should call clearSend', () => {
-      expect(propsMethodSpies.clearSend.callCount).toStrictEqual(0);
+    it('should call resetSendState', () => {
+      expect(propsMethodSpies.resetSendState.callCount).toStrictEqual(0);
       wrapper.instance().onClose();
-      expect(propsMethodSpies.clearSend.callCount).toStrictEqual(1);
+      expect(propsMethodSpies.resetSendState.callCount).toStrictEqual(1);
     });
 
     it('should call history.push', () => {

@@ -38,10 +38,11 @@ import {
   getTokenExchangeRates,
   getSwapsDefaultToken,
   getCurrentChainId,
-  getNativeCurrency,
 } from '../../../selectors';
+import { getNativeCurrency, getTokens } from '../../../ducks/metamask/metamask';
+
 import { toPrecisionWithoutTrailingZeros } from '../../../helpers/utils/util';
-import { getTokens } from '../../../ducks/metamask/metamask';
+
 import {
   safeRefetchQuotes,
   setCustomApproveTxData,

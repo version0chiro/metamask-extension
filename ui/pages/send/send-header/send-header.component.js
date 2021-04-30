@@ -4,7 +4,7 @@ import PageContainerHeader from '../../../components/ui/page-container/page-cont
 
 export default class SendHeader extends Component {
   static propTypes = {
-    clearSend: PropTypes.func,
+    resetSendState: PropTypes.func,
     history: PropTypes.object,
     mostRecentOverviewPage: PropTypes.string,
     titleKey: PropTypes.string,
@@ -15,8 +15,8 @@ export default class SendHeader extends Component {
   };
 
   onClose() {
-    const { clearSend, history, mostRecentOverviewPage } = this.props;
-    clearSend();
+    const { resetSendState, history, mostRecentOverviewPage } = this.props;
+    resetSendState();
     history.push(mostRecentOverviewPage);
   }
 

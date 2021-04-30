@@ -1,11 +1,12 @@
 import { connect } from 'react-redux';
 import {
-  getSendTo,
   accountsWithSendEtherInfoSelector,
   getAddressBookEntry,
   getIsEthGasPriceFetched,
   getNoGasPriceFetched,
 } from '../../../selectors';
+
+import { getSendTo } from '../../../ducks/send';
 
 import * as actions from '../../../store/actions';
 import SendContent from './send-content.component';

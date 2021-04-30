@@ -8,7 +8,7 @@ export default class SendFooter extends Component {
     addToAddressBookIfNew: PropTypes.func,
     amount: PropTypes.string,
     data: PropTypes.string,
-    clearSend: PropTypes.func,
+    resetSendState: PropTypes.func,
     editingTransactionId: PropTypes.string,
     from: PropTypes.object,
     gasLimit: PropTypes.string,
@@ -36,8 +36,8 @@ export default class SendFooter extends Component {
   };
 
   onCancel() {
-    const { clearSend, history, mostRecentOverviewPage } = this.props;
-    clearSend();
+    const { resetSendState, history, mostRecentOverviewPage } = this.props;
+    resetSendState();
     history.push(mostRecentOverviewPage);
   }
 

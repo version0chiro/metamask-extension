@@ -14,19 +14,19 @@ import {
   getTokenValueParam,
 } from '../../helpers/utils/token-util';
 import { useTokenTracker } from '../../hooks/useTokenTracker';
-import { getTokens } from '../../ducks/metamask/metamask';
+import { getTokens, getNativeCurrency } from '../../ducks/metamask/metamask';
 import {
   transactionFeeSelector,
   txDataSelector,
   getCurrentCurrency,
   getDomainMetadata,
-  getNativeCurrency,
   getUseNonceField,
   getCustomNonceValue,
   getNextSuggestedNonce,
   getNoGasPriceFetched,
   getIsEthGasPriceFetched,
 } from '../../selectors';
+
 import { currentNetworkTxListSelector } from '../../selectors/transactions';
 import Loading from '../../components/ui/loading-screen';
 import { getCustomTxParamsData } from './confirm-approve.util';

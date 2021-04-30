@@ -2,7 +2,7 @@ import { combineReducers } from 'redux';
 import { ALERT_TYPES } from '../../shared/constants/alerts';
 import metamaskReducer from './metamask/metamask';
 import localeMessagesReducer from './locale/locale';
-import sendReducer from './send/send.duck';
+import sendReducer from './send/send';
 import appStateReducer from './app/app';
 import confirmTransactionReducer from './confirm-transaction/confirm-transaction.duck';
 import gasReducer from './gas/gas.duck';

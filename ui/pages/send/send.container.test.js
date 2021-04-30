@@ -1,12 +1,11 @@
 import sinon from 'sinon';
 
 import {
+  updateSendErrors,
+  resetSendState,
   updateSendTokenBalance,
   updateGasData,
-  setGasTotal,
-} from '../../store/actions';
-
-import { updateSendErrors, resetSendState } from '../../ducks/send/send.duck';
+} from '../../ducks/send';
 
 let mapDispatchToProps;
 
@@ -25,14 +24,11 @@ jest.mock('redux', () => ({
   compose: (_, arg2) => () => arg2(),
 }));
 
-jest.mock('../../store/actions', () => ({
-  updateSendTokenBalance: jest.fn(),
-  updateGasData: jest.fn(),
-  setGasTotal: jest.fn(),
-}));
-jest.mock('../../ducks/send/send.duck', () => ({
+jest.mock('../../ducks/send', () => ({
   updateSendErrors: jest.fn(),
   resetSendState: jest.fn(),
+  updateSendTokenBalance: jest.fn(),
+  updateGasData: jest.fn(),
 }));
 
 jest.mock('./send.utils.js', () => ({
@@ -63,12 +59,6 @@ describe('send container', () => {
         value: 'mockValue',
         data: undefined,
       };
-
-      it('should dispatch a setGasTotal action when editingTransactionId is truthy', () => {
-        mapDispatchToPropsObject.updateAndSetGasLimit(mockProps);
-        expect(dispatchSpy.calledOnce).toStrictEqual(true);
-        expect(setGasTotal).toHaveBeenCalledWith('0x30x4');
-      });
 
       it('should dispatch an updateGasData action when editingTransactionId is falsy', () => {
         const {

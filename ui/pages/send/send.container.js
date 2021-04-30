@@ -3,8 +3,21 @@ import { withRouter } from 'react-router-dom';
 import { compose } from 'redux';
 
 import {
-  getBlockGasLimit,
-  getConversionRate,
+  getSelectedAddress,
+  getAddressBook,
+  isCustomPriceExcessive,
+  getCurrentChainId,
+} from '../../selectors';
+
+import { showQrScanner, qrCodeDetected } from '../../store/actions';
+import {
+  resetSendState,
+  updateSendErrors,
+  updateSendTokenBalance,
+  updateSendEnsResolution,
+  updateSendEnsResolutionError,
+  updateSendTo,
+  updateGasData,
   getGasLimit,
   getGasPrice,
   getGasTotal,
@@ -13,34 +26,21 @@ import {
   getSendTokenContract,
   getSendAmount,
   getSendEditingTransactionId,
-  getSendHexDataFeatureFlagState,
   getSendFromObject,
   getSendTo,
   getSendToNickname,
   getTokenBalance,
-  getQrCodeData,
-  getSelectedAddress,
-  getAddressBook,
   getSendTokenAddress,
-  isCustomPriceExcessive,
-  getCurrentChainId,
-} from '../../selectors';
-
-import {
-  updateSendTo,
-  updateSendTokenBalance,
-  updateGasData,
-  setGasTotal,
-  showQrScanner,
-  qrCodeDetected,
-  updateSendEnsResolution,
-  updateSendEnsResolutionError,
-} from '../../store/actions';
-import { resetSendState, updateSendErrors } from '../../ducks/send/send.duck';
+} from '../../ducks/send';
 import { fetchBasicGasEstimates } from '../../ducks/gas/gas.duck';
-import { getTokens } from '../../ducks/metamask/metamask';
+import { getQrCodeData } from '../../ducks/app/app';
+import {
+  getTokens,
+  getBlockGasLimit,
+  getConversionRate,
+  getSendHexDataFeatureFlagState,
+} from '../../ducks/metamask/metamask';
 import { isValidDomainName } from '../../helpers/utils/util';
-import { calcGasTotal } from './send.utils';
 import SendEther from './send.component';
 
 function mapStateToProps(state) {
@@ -77,7 +77,6 @@ function mapDispatchToProps(dispatch) {
     updateAndSetGasLimit: ({
       blockGasLimit,
       editingTransactionId,
-      gasLimit,
       gasPrice,
       selectedAddress,
       sendToken,
@@ -85,19 +84,19 @@ function mapDispatchToProps(dispatch) {
       value,
       data,
     }) => {
-      editingTransactionId
-        ? dispatch(setGasTotal(calcGasTotal(gasLimit, gasPrice)))
-        : dispatch(
-            updateGasData({
-              gasPrice,
-              selectedAddress,
-              sendToken,
-              blockGasLimit,
-              to,
-              value,
-              data,
-            }),
-          );
+      if (!editingTransactionId) {
+        dispatch(
+          updateGasData({
+            gasPrice,
+            selectedAddress,
+            sendToken,
+            blockGasLimit,
+            to,
+            value,
+            data,
+          }),
+        );
+      }
     },
     updateSendTokenBalance: ({ sendToken, tokenContract, address }) => {
       dispatch(
@@ -112,7 +111,7 @@ function mapDispatchToProps(dispatch) {
     resetSendState: () => dispatch(resetSendState()),
     scanQrCode: () => dispatch(showQrScanner()),
     qrCodeDetected: (data) => dispatch(qrCodeDetected(data)),
-    updateSendTo: (to, nickname) => dispatch(updateSendTo(to, nickname)),
+    updateSendTo: (to, nickname) => dispatch(updateSendTo({ to, nickname })),
     fetchBasicGasEstimates: () => dispatch(fetchBasicGasEstimates()),
     updateSendEnsResolution: (ensResolution) =>
       dispatch(updateSendEnsResolution(ensResolution)),

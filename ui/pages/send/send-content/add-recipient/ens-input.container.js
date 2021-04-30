@@ -1,11 +1,7 @@
 import { connect } from 'react-redux';
 import { CHAIN_ID_TO_NETWORK_ID_MAP } from '../../../../../shared/constants/network';
-import {
-  getSendTo,
-  getSendToNickname,
-  getAddressBookEntry,
-  getCurrentChainId,
-} from '../../../../selectors';
+import { getAddressBookEntry, getCurrentChainId } from '../../../../selectors';
+import { getSendTo, getSendToNickname } from '../../../../ducks/send';
 import EnsInput from './ens-input.component';
 
 export default connect((state) => {

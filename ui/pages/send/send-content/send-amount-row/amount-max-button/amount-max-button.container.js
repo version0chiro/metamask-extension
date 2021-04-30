@@ -1,14 +1,15 @@
 import { connect } from 'react-redux';
+import { getBasicGasEstimateLoadingStatus } from '../../../../../selectors';
 import {
+  updateSendErrors,
+  setMaxModeTo,
+  updateSendAmount,
   getGasTotal,
   getSendToken,
   getSendFromBalance,
   getTokenBalance,
   getSendMaxModeState,
-  getBasicGasEstimateLoadingStatus,
-} from '../../../../../selectors';
-import { updateSendAmount, setMaxModeTo } from '../../../../../store/actions';
-import { updateSendErrors } from '../../../../../ducks/send/send.duck';
+} from '../../../../../ducks/send';
 import { calcMaxAmount } from './amount-max-button.utils';
 import AmountMaxButton from './amount-max-button.component';
 

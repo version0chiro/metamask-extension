@@ -1,7 +1,15 @@
 import { connect } from 'react-redux';
 import { compose } from 'redux';
 import { withRouter } from 'react-router-dom';
-import { updateSend } from '../../store/actions';
+import {
+  setGasLimit,
+  setGasPrice,
+  updateSendAmount,
+  updateSendErrors,
+  updateSendTo,
+  setSendFrom,
+  setEditingTransactionId,
+} from '../../ducks/send';
 import { clearConfirmTransaction } from '../../ducks/confirm-transaction/confirm-transaction.duck';
 import ConfirmSendEther from './confirm-send-ether.component';
 
@@ -21,19 +29,13 @@ const mapDispatchToProps = (dispatch) => {
       const { id, txParams } = txData;
       const { from, gas: gasLimit, gasPrice, to, value: amount } = txParams;
 
-      dispatch(
-        updateSend({
-          from,
-          gasLimit,
-          gasPrice,
-          gasTotal: null,
-          to,
-          amount,
-          errors: { to: null, amount: null },
-          editingTransactionId: id?.toString(),
-        }),
-      );
-
+      dispatch(updateSendTo({ to }));
+      dispatch(setGasLimit(gasLimit));
+      dispatch(setGasPrice(gasPrice));
+      dispatch(updateSendAmount(amount));
+      dispatch(updateSendErrors({ to: null, amount: null }));
+      dispatch(setSendFrom(from));
+      dispatch(setEditingTransactionId(id?.toString()));
       dispatch(clearConfirmTransaction());
     },
   };

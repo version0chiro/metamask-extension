@@ -1,6 +1,5 @@
 import { connect } from 'react-redux';
-import { clearSend } from '../../../store/actions';
-import { getTitleKey } from '../../../selectors';
+import { getTitleKey, resetSendState } from '../../../ducks/send';
 import { getMostRecentOverviewPage } from '../../../ducks/history/history';
 import SendHeader from './send-header.component';
 
@@ -15,6 +14,6 @@ function mapStateToProps(state) {
 
 function mapDispatchToProps(dispatch) {
   return {
-    clearSend: () => dispatch(clearSend()),
+    resetSendState: () => dispatch(resetSendState()),
   };
 }

@@ -12,12 +12,9 @@ import { calcTokenAmount } from '../../helpers/utils/token-util';
 import { addHexPrefix } from '../../../app/scripts/lib/util';
 
 import {
-  BASE_TOKEN_GAS_COST,
   INSUFFICIENT_FUNDS_ERROR,
   INSUFFICIENT_TOKENS_ERROR,
-  MIN_GAS_LIMIT_HEX,
   NEGATIVE_ETH_ERROR,
-  SIMPLE_GAS_COST,
   TOKEN_TRANSFER_FUNCTION_SIGNATURE,
 } from './send.constants';
 
@@ -26,7 +23,6 @@ export {
   calcGasTotal,
   calcTokenBalance,
   doesAmountErrorRequireUpdate,
-  estimateGasForSend,
   generateTokenTransferData,
   getAmountErrorObject,
   getGasFeeErrorObject,
@@ -188,94 +184,6 @@ function doesAmountErrorRequireUpdate({
     balanceHasChanged || gasTotalHasChange || tokenBalanceHasChanged;
 
   return amountErrorRequiresUpdate;
-}
-
-async function estimateGasForSend({
-  selectedAddress,
-  sendToken,
-  blockGasLimit = MIN_GAS_LIMIT_HEX,
-  to,
-  value,
-  data,
-  gasPrice,
-  estimateGasMethod,
-}) {
-  const paramsForGasEstimate = { from: selectedAddress, value, gasPrice };
-
-  // if recipient has no code, gas is 21k max:
-  if (!sendToken && !data) {
-    const code = Boolean(to) && (await global.eth.getCode(to));
-    // Geth will return '0x', and ganache-core v2.2.1 will return '0x0'
-    const codeIsEmpty = !code || code === '0x' || code === '0x0';
-    if (codeIsEmpty) {
-      return SIMPLE_GAS_COST;
-    }
-  } else if (sendToken && !to) {
-    return BASE_TOKEN_GAS_COST;
-  }
-
-  if (sendToken) {
-    paramsForGasEstimate.value = '0x0';
-    paramsForGasEstimate.data = generateTokenTransferData({
-      toAddress: to,
-      amount: value,
-      sendToken,
-    });
-    paramsForGasEstimate.to = sendToken.address;
-  } else {
-    if (data) {
-      paramsForGasEstimate.data = data;
-    }
-
-    if (to) {
-      paramsForGasEstimate.to = to;
-    }
-
-    if (!value || value === '0') {
-      paramsForGasEstimate.value = '0xff';
-    }
-  }
-
-  // if not, fall back to block gasLimit
-  if (!blockGasLimit) {
-    // eslint-disable-next-line no-param-reassign
-    blockGasLimit = MIN_GAS_LIMIT_HEX;
-  }
-
-  paramsForGasEstimate.gas = addHexPrefix(
-    multiplyCurrencies(blockGasLimit, 0.95, {
-      multiplicandBase: 16,
-      multiplierBase: 10,
-      roundDown: '0',
-      toNumericBase: 'hex',
-    }),
-  );
-
-  // run tx
-  try {
-    const estimatedGas = await estimateGasMethod(paramsForGasEstimate);
-    const estimateWithBuffer = addGasBuffer(
-      estimatedGas.toString(16),
-      blockGasLimit,
-      1.5,
-    );
-    return addHexPrefix(estimateWithBuffer);
-  } catch (error) {
-    const simulationFailed =
-      error.message.includes('Transaction execution error.') ||
-      error.message.includes(
-        'gas required exceeds allowance or always failing transaction',
-      );
-    if (simulationFailed) {
-      const estimateWithBuffer = addGasBuffer(
-        paramsForGasEstimate.gas,
-        blockGasLimit,
-        1.5,
-      );
-      return addHexPrefix(estimateWithBuffer);
-    }
-    throw error;
-  }
 }
 
 function addGasBuffer(

@@ -2,13 +2,9 @@ import { connect } from 'react-redux';
 import { addHexPrefix } from '../../../../../app/scripts/lib/util';
 import {
   hideModal,
-  setGasLimit,
-  setGasPrice,
   createRetryTransaction,
   createSpeedUpTransaction,
   hideSidebar,
-  updateSendAmount,
-  setGasTotal,
   updateTransaction,
 } from '../../../../store/actions';
 import {
@@ -20,13 +16,21 @@ import {
 import {
   hideGasButtonGroup,
   updateSendErrors,
-} from '../../../../ducks/send/send.duck';
+  setGasLimit,
+  setGasPrice,
+  updateSendAmount,
+  getTokenBalance,
+  getSendMaxModeState,
+  getSendToken,
+  getGasLimit,
+  getGasPrice,
+  getSendAmount,
+} from '../../../../ducks/send';
 import {
   conversionRateSelector as getConversionRate,
   getCurrentCurrency,
   getCurrentEthBalance,
   getIsMainnet,
-  getSendToken,
   getPreferences,
   getBasicGasEstimateLoadingStatus,
   getCustomGasLimit,
@@ -34,8 +38,6 @@ import {
   getDefaultActiveButtonIndex,
   getRenderableBasicEstimateData,
   isCustomPriceSafe,
-  getTokenBalance,
-  getSendMaxModeState,
   getAveragePriceEstimateInHexWEI,
   isCustomPriceExcessive,
 } from '../../../../selectors';
@@ -58,7 +60,10 @@ import { TRANSACTION_STATUSES } from '../../../../../shared/constants/transactio
 import GasModalPageContainer from './gas-modal-page-container.component';
 
 const mapStateToProps = (state, ownProps) => {
-  const { currentNetworkTxList, send } = state.metamask;
+  const gasLimit = getGasLimit(state);
+  const gasPrice = getGasPrice(state);
+  const amount = getSendAmount(state);
+  const { currentNetworkTxList } = state.metamask;
   const { modalState: { props: modalProps } = {} } = state.appState.modal || {};
   const { txData = {} } = modalProps || {};
   const { transaction = {}, onSubmit } = ownProps;
@@ -72,9 +77,9 @@ const mapStateToProps = (state, ownProps) => {
   const txParams = selectedTransaction?.txParams
     ? selectedTransaction.txParams
     : {
-        gas: send.gasLimit || '0x5208',
-        gasPrice: send.gasPrice || getAveragePriceEstimateInHexWEI(state, true),
-        value: sendToken ? '0x0' : send.amount,
+        gas: gasLimit || '0x5208',
+        gasPrice: gasPrice || getAveragePriceEstimateInHexWEI(state, true),
+        value: sendToken ? '0x0' : amount,
       };
 
   const { gasPrice: currentGasPrice, gas: currentGasLimit } = txParams;
@@ -211,7 +216,6 @@ const mapDispatchToProps = (dispatch) => {
     hideGasButtonGroup: () => dispatch(hideGasButtonGroup()),
     hideSidebar: () => dispatch(hideSidebar()),
     fetchBasicGasEstimates: () => dispatch(fetchBasicGasEstimates()),
-    setGasTotal: (total) => dispatch(setGasTotal(total)),
     setAmountToMax: (maxAmountDataObject) => {
       dispatch(updateSendErrors({ amount: null }));
       dispatch(updateSendAmount(calcMaxAmount(maxAmountDataObject)));

@@ -147,11 +147,9 @@ export default class SendGasRow extends Component {
       <div>
         <AdvancedGasInputs
           updateCustomGasPrice={(newGasPrice) =>
-            setGasPrice({ gasPrice: newGasPrice, gasLimit })
+            setGasPrice({ gasPrice: newGasPrice })
           }
-          updateCustomGasLimit={(newGasLimit) =>
-            setGasLimit(newGasLimit, gasPrice)
-          }
+          updateCustomGasLimit={setGasLimit}
           customGasPrice={gasPrice}
           customGasLimit={gasLimit}
           insufficientBalance={insufficientBalance}

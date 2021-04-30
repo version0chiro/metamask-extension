@@ -1,12 +1,18 @@
 import { connect } from 'react-redux';
 import {
   addToAddressBook,
-  clearSend,
   signTokenTx,
   signTx,
   updateTransaction,
 } from '../../../store/actions';
 import {
+  getGasIsLoading,
+  getRenderableEstimateDataForSmallButtonsFromGWEI,
+  getDefaultActiveButtonIndex,
+  getNoGasPriceFetched,
+} from '../../../selectors';
+import {
+  resetSendState,
   getGasLimit,
   getGasPrice,
   getGasTotal,
@@ -15,17 +21,15 @@ import {
   getSendEditingTransactionId,
   getSendFromObject,
   getSendTo,
-  getSendToAccounts,
   getSendHexData,
   getTokenBalance,
-  getUnapprovedTxs,
   getSendErrors,
   isSendFormInError,
-  getGasIsLoading,
-  getRenderableEstimateDataForSmallButtonsFromGWEI,
-  getDefaultActiveButtonIndex,
-  getNoGasPriceFetched,
-} from '../../../selectors';
+} from '../../../ducks/send';
+import {
+  getSendToAccounts,
+  getUnapprovedTxs,
+} from '../../../ducks/metamask/metamask';
 import { getMostRecentOverviewPage } from '../../../ducks/history/history';
 import { addHexPrefix } from '../../../../app/scripts/lib/util';
 import SendFooter from './send-footer.component';
@@ -74,7 +78,7 @@ function mapStateToProps(state) {
 
 function mapDispatchToProps(dispatch) {
   return {
-    clearSend: () => dispatch(clearSend()),
+    resetSendState: () => dispatch(resetSendState()),
     sign: ({ sendToken, to, amount, from, gas, gasPrice, data }) => {
       const txParams = constructTxParams({
         amount,

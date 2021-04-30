@@ -1,11 +1,7 @@
 import sinon from 'sinon';
 
-import {
-  clearSend,
-  signTx,
-  signTokenTx,
-  addToAddressBook,
-} from '../../../store/actions';
+import { signTx, signTokenTx, addToAddressBook } from '../../../store/actions';
+import { resetSendState } from '../../../ducks/send';
 import {
   addressIsNew,
   constructTxParams,
@@ -23,13 +19,17 @@ jest.mock('react-redux', () => ({
 
 jest.mock('../../../store/actions.js', () => ({
   addToAddressBook: jest.fn(),
-  clearSend: jest.fn(),
   signTokenTx: jest.fn(),
   signTx: jest.fn(),
   updateTransaction: jest.fn(),
 }));
 
-jest.mock('../../../selectors/send.js', () => ({
+jest.mock('../../../ducks/metamask/metamask', () => ({
+  getSendToAccounts: (s) => `mockToAccounts:${s}`,
+  getUnapprovedTxs: (s) => `mockUnapprovedTxs:${s}`,
+}));
+
+jest.mock('../../../ducks/send', () => ({
   getGasLimit: (s) => `mockGasLimit:${s}`,
   getGasPrice: (s) => `mockGasPrice:${s}`,
   getGasTotal: (s) => `mockGasTotal:${s}`,
@@ -39,13 +39,12 @@ jest.mock('../../../selectors/send.js', () => ({
   getSendFromObject: (s) => `mockFromObject:${s}`,
   getSendTo: (s) => `mockTo:${s}`,
   getSendToNickname: (s) => `mockToNickname:${s}`,
-  getSendToAccounts: (s) => `mockToAccounts:${s}`,
   getTokenBalance: (s) => `mockTokenBalance:${s}`,
   getSendHexData: (s) => `mockHexData:${s}`,
-  getUnapprovedTxs: (s) => `mockUnapprovedTxs:${s}`,
   getSendErrors: (s) => `mockSendErrors:${s}`,
   isSendFormInError: (s) => `mockInError:${s}`,
   getDefaultActiveButtonIndex: () => 0,
+  resetSendState: jest.fn(),
 }));
 
 jest.mock('../../../selectors/custom-gas.js', () => ({
@@ -74,11 +73,11 @@ describe('send-footer container', () => {
       mapDispatchToPropsObject = mapDispatchToProps(dispatchSpy);
     });
 
-    describe('clearSend()', () => {
+    describe('resetSendState()', () => {
       it('should dispatch an action', () => {
-        mapDispatchToPropsObject.clearSend();
+        mapDispatchToPropsObject.resetSendState();
         expect(dispatchSpy.calledOnce).toStrictEqual(true);
-        expect(clearSend).toHaveBeenCalled();
+        expect(resetSendState).toHaveBeenCalled();
       });
     });
 

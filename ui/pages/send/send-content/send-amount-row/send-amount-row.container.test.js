@@ -1,8 +1,10 @@
 import sinon from 'sinon';
 
-import { setMaxModeTo, updateSendAmount } from '../../../../store/actions';
-
-import { updateSendErrors } from '../../../../ducks/send/send.duck';
+import {
+  updateSendErrors,
+  updateSendAmount,
+  setMaxModeTo,
+} from '../../../../ducks/send';
 
 let mapDispatchToProps;
 
@@ -13,8 +15,11 @@ jest.mock('react-redux', () => ({
   },
 }));
 
-jest.mock('../../../../selectors/send.js', () => ({
+jest.mock('../../../../ducks/send', () => ({
   sendAmountIsInError: (s) => `mockInError:${s}`,
+  setMaxModeTo: jest.fn(),
+  updateSendAmount: jest.fn(),
+  updateSendErrors: jest.fn(),
 }));
 
 jest.mock('../../send.utils', () => ({
@@ -26,15 +31,6 @@ jest.mock('../../send.utils', () => ({
     ...mockDataObject,
     mockGasFeeErrorChange: true,
   }),
-}));
-
-jest.mock('../../../../store/actions', () => ({
-  setMaxModeTo: jest.fn(),
-  updateSendAmount: jest.fn(),
-}));
-
-jest.mock('../../../../ducks/send/send.duck', () => ({
-  updateSendErrors: jest.fn(),
 }));
 
 require('./send-amount-row.container.js');

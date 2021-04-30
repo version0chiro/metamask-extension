@@ -10,7 +10,7 @@ describe('SendFooter Component', () => {
 
   const propsMethodSpies = {
     addToAddressBookIfNew: sinon.spy(),
-    clearSend: sinon.spy(),
+    resetSendState: sinon.spy(),
     sign: sinon.spy(),
     update: sinon.spy(),
     mostRecentOverviewPage: '/',
@@ -30,7 +30,7 @@ describe('SendFooter Component', () => {
       <SendFooter
         addToAddressBookIfNew={propsMethodSpies.addToAddressBookIfNew}
         amount="mockAmount"
-        clearSend={propsMethodSpies.clearSend}
+        resetSendState={propsMethodSpies.resetSendState}
         disabled
         editingTransactionId="mockEditingTransactionId"
         errors={{}}
@@ -56,9 +56,9 @@ describe('SendFooter Component', () => {
   });
 
   afterEach(() => {
-    propsMethodSpies.clearSend.resetHistory();
+    propsMethodSpies.resetSendState.resetHistory();
     propsMethodSpies.addToAddressBookIfNew.resetHistory();
-    propsMethodSpies.clearSend.resetHistory();
+    propsMethodSpies.resetSendState.resetHistory();
     propsMethodSpies.sign.resetHistory();
     propsMethodSpies.update.resetHistory();
     historySpies.push.resetHistory();
@@ -71,10 +71,10 @@ describe('SendFooter Component', () => {
   });
 
   describe('onCancel', () => {
-    it('should call clearSend', () => {
-      expect(propsMethodSpies.clearSend.callCount).toStrictEqual(0);
+    it('should call resetSendState', () => {
+      expect(propsMethodSpies.resetSendState.callCount).toStrictEqual(0);
       wrapper.instance().onCancel();
-      expect(propsMethodSpies.clearSend.callCount).toStrictEqual(1);
+      expect(propsMethodSpies.resetSendState.callCount).toStrictEqual(1);
     });
 
     it('should call history.push', () => {
@@ -206,7 +206,7 @@ describe('SendFooter Component', () => {
         <SendFooter
           addToAddressBookIfNew={propsMethodSpies.addToAddressBookIfNew}
           amount="mockAmount"
-          clearSend={propsMethodSpies.clearSend}
+          resetSendState={propsMethodSpies.resetSendState}
           disabled
           editingTransactionId="mockEditingTransactionId"
           errors={{}}

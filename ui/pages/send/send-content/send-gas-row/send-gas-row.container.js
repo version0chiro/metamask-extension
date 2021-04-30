@@ -1,6 +1,22 @@
 import { connect } from 'react-redux';
 import {
-  getConversionRate,
+  getAdvancedInlineGasShown,
+  getCurrentEthBalance,
+  getBasicGasEstimateLoadingStatus,
+  getRenderableEstimateDataForSmallButtonsFromGWEI,
+  getDefaultActiveButtonIndex,
+  getIsMainnet,
+  getIsEthGasPriceFetched,
+  getNoGasPriceFetched,
+} from '../../../../selectors';
+import { isBalanceSufficient } from '../../send.utils';
+import { calcMaxAmount } from '../send-amount-row/amount-max-button/amount-max-button.utils';
+import {
+  showGasButtonGroup,
+  updateSendErrors,
+  setGasLimit,
+  setGasPrice,
+  updateSendAmount,
   getGasTotal,
   getGasPrice,
   getGasLimit,
@@ -11,34 +27,15 @@ import {
   getGasLoadingError,
   gasFeeIsInError,
   getGasButtonGroupShown,
-  getAdvancedInlineGasShown,
-  getCurrentEthBalance,
   getSendToken,
-  getBasicGasEstimateLoadingStatus,
-  getRenderableEstimateDataForSmallButtonsFromGWEI,
-  getDefaultActiveButtonIndex,
-  getIsMainnet,
-  getIsEthGasPriceFetched,
-  getNoGasPriceFetched,
-} from '../../../../selectors';
-import { isBalanceSufficient, calcGasTotal } from '../../send.utils';
-import { calcMaxAmount } from '../send-amount-row/amount-max-button/amount-max-button.utils';
-import {
-  showGasButtonGroup,
-  updateSendErrors,
-} from '../../../../ducks/send/send.duck';
+} from '../../../../ducks/send';
+import { getConversionRate } from '../../../../ducks/metamask/metamask';
 import {
   resetCustomData,
   setCustomGasPrice,
   setCustomGasLimit,
 } from '../../../../ducks/gas/gas.duck';
-import {
-  showModal,
-  setGasPrice,
-  setGasLimit,
-  setGasTotal,
-  updateSendAmount,
-} from '../../../../store/actions';
+import { showModal } from '../../../../store/actions';
 import SendGasRow from './send-gas-row.component';
 
 export default connect(
@@ -98,19 +95,13 @@ function mapDispatchToProps(dispatch) {
   return {
     showCustomizeGasModal: () =>
       dispatch(showModal({ name: 'CUSTOMIZE_GAS', hideBasic: true })),
-    setGasPrice: ({ gasPrice, gasLimit }) => {
+    setGasPrice: ({ gasPrice }) => {
       dispatch(setGasPrice(gasPrice));
       dispatch(setCustomGasPrice(gasPrice));
-      if (gasLimit) {
-        dispatch(setGasTotal(calcGasTotal(gasLimit, gasPrice)));
-      }
     },
-    setGasLimit: (newLimit, gasPrice) => {
+    setGasLimit: (newLimit) => {
       dispatch(setGasLimit(newLimit));
       dispatch(setCustomGasLimit(newLimit));
-      if (gasPrice) {
-        dispatch(setGasTotal(calcGasTotal(newLimit, gasPrice)));
-      }
     },
     setAmountToMax: (maxAmountDataObject) => {
       dispatch(updateSendErrors({ amount: null }));

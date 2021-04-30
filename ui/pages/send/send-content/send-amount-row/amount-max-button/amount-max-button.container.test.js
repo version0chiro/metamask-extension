@@ -1,8 +1,10 @@
 import sinon from 'sinon';
 
-import { setMaxModeTo, updateSendAmount } from '../../../../../store/actions';
-
-import { updateSendErrors } from '../../../../../ducks/send/send.duck';
+import {
+  updateSendErrors,
+  updateSendAmount,
+  setMaxModeTo,
+} from '../../../../../ducks/send';
 
 let mapStateToProps;
 let mapDispatchToProps;
@@ -16,11 +18,6 @@ jest.mock('react-redux', () => ({
 }));
 
 jest.mock('../../../../../selectors', () => ({
-  getGasTotal: (s) => `mockGasTotal:${s}`,
-  getSendToken: (s) => `mockSendToken:${s}`,
-  getSendFromBalance: (s) => `mockBalance:${s}`,
-  getTokenBalance: (s) => `mockTokenBalance:${s}`,
-  getSendMaxModeState: (s) => `mockMaxModeOn:${s}`,
   getBasicGasEstimateLoadingStatus: (s) => `mockButtonDataLoading:${s}`,
 }));
 
@@ -28,12 +25,15 @@ jest.mock('./amount-max-button.utils.js', () => ({
   calcMaxAmount: (mockObj) => mockObj.val + 1,
 }));
 
-jest.mock('../../../../../store/actions', () => ({
+jest.mock('../../../../../ducks/send', () => ({
+  updateSendErrors: jest.fn(),
   setMaxModeTo: jest.fn(),
   updateSendAmount: jest.fn(),
-}));
-jest.mock('../../../../../ducks/send/send.duck', () => ({
-  updateSendErrors: jest.fn(),
+  getGasTotal: (s) => `mockGasTotal:${s}`,
+  getSendToken: (s) => `mockSendToken:${s}`,
+  getSendFromBalance: (s) => `mockBalance:${s}`,
+  getSendMaxModeState: (s) => `mockMaxModeOn:${s}`,
+  getTokenBalance: (s) => `mockTokenBalance:${s}`,
 }));
 
 require('./amount-max-button.container.js');

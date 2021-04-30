@@ -1,13 +1,15 @@
 import { connect } from 'react-redux';
 import {
-  getSendEnsResolution,
-  getSendEnsResolutionError,
   accountsWithSendEtherInfoSelector,
   getAddressBook,
   getAddressBookEntry,
 } from '../../../../selectors';
 
-import { updateSendTo } from '../../../../store/actions';
+import {
+  updateSendTo,
+  getSendEnsResolution,
+  getSendEnsResolutionError,
+} from '../../../../ducks/send';
 import AddRecipient from './add-recipient.component';
 
 export default connect(mapStateToProps, mapDispatchToProps)(AddRecipient);
@@ -40,6 +42,6 @@ function mapStateToProps(state) {
 
 function mapDispatchToProps(dispatch) {
   return {
-    updateSendTo: (to, nickname) => dispatch(updateSendTo(to, nickname)),
+    updateSendTo: (to, nickname) => dispatch(updateSendTo({ to, nickname })),
   };
 }

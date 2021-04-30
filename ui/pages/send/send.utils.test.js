@@ -1,4 +1,3 @@
-import sinon from 'sinon';
 import { rawEncode } from 'ethereumjs-abi';
 
 import {
@@ -10,7 +9,6 @@ import {
 
 import {
   calcGasTotal,
-  estimateGasForSend,
   doesAmountErrorRequireUpdate,
   generateTokenTransferData,
   getAmountErrorObject,
@@ -23,8 +21,6 @@ import {
 } from './send.utils';
 
 import {
-  BASE_TOKEN_GAS_COST,
-  SIMPLE_GAS_COST,
   INSUFFICIENT_FUNDS_ERROR,
   INSUFFICIENT_TOKENS_ERROR,
 } from './send.constants';
@@ -278,167 +274,6 @@ describe('send utils', () => {
       );
 
       expect(result).toStrictEqual(false);
-    });
-  });
-
-  describe('estimateGasForSend', () => {
-    const baseMockParams = {
-      blockGasLimit: '0x64',
-      selectedAddress: 'mockAddress',
-      to: '0xisContract',
-      estimateGasMethod: sinon.stub().callsFake(({ to }) => {
-        if (typeof to === 'string' && to.match(/willFailBecauseOf:/u)) {
-          throw new Error(to.match(/:(.+)$/u)[1]);
-        }
-        return { toString: (n) => `0xabc${n}` };
-      }),
-    };
-    const baseexpectedCall = {
-      from: 'mockAddress',
-      gas: '0x64x0.95',
-      to: '0xisContract',
-      value: '0xff',
-    };
-
-    beforeEach(() => {
-      global.eth = {
-        getCode: sinon
-          .stub()
-          .callsFake((address) =>
-            Promise.resolve(address.match(/isContract/u) ? 'not-0x' : '0x'),
-          ),
-      };
-    });
-
-    afterEach(() => {
-      baseMockParams.estimateGasMethod.resetHistory();
-      global.eth.getCode.resetHistory();
-    });
-
-    it('should call ethQuery.estimateGasForSend with the expected params', async () => {
-      const result = await estimateGasForSend(baseMockParams);
-      expect(baseMockParams.estimateGasMethod.callCount).toStrictEqual(1);
-      expect(baseMockParams.estimateGasMethod.getCall(0).args[0]).toStrictEqual(
-        {
-          gasPrice: undefined,
-          value: undefined,
-          ...baseexpectedCall,
-        },
-      );
-      expect(result).toStrictEqual('0xabc16');
-    });
-
-    it('should call ethQuery.estimateGasForSend with the expected params when initialGasLimitHex is lower than the upperGasLimit', async () => {
-      const result = await estimateGasForSend({
-        ...baseMockParams,
-        blockGasLimit: '0xbcd',
-      });
-      expect(baseMockParams.estimateGasMethod.callCount).toStrictEqual(1);
-      expect(baseMockParams.estimateGasMethod.getCall(0).args[0]).toStrictEqual(
-        {
-          gasPrice: undefined,
-          value: undefined,
-          ...baseexpectedCall,
-          gas: '0xbcdx0.95',
-        },
-      );
-      expect(result).toStrictEqual('0xabc16x1.5');
-    });
-
-    it('should call ethQuery.estimateGasForSend with a value of 0x0 and the expected data and to if passed a sendToken', async () => {
-      const result = await estimateGasForSend({
-        data: 'mockData',
-        sendToken: { address: 'mockAddress' },
-        ...baseMockParams,
-      });
-      expect(baseMockParams.estimateGasMethod.callCount).toStrictEqual(1);
-      expect(baseMockParams.estimateGasMethod.getCall(0).args[0]).toStrictEqual(
-        {
-          ...baseexpectedCall,
-          gasPrice: undefined,
-          value: '0x0',
-          data: '0xa9059cbb',
-          to: 'mockAddress',
-        },
-      );
-      expect(result).toStrictEqual('0xabc16');
-    });
-
-    it('should call ethQuery.estimateGasForSend without a recipient if the recipient is empty and data passed', async () => {
-      const data = 'mockData';
-      const to = '';
-      const result = await estimateGasForSend({ ...baseMockParams, data, to });
-      expect(baseMockParams.estimateGasMethod.callCount).toStrictEqual(1);
-      expect(baseMockParams.estimateGasMethod.getCall(0).args[0]).toStrictEqual(
-        {
-          gasPrice: undefined,
-          value: '0xff',
-          data,
-          from: baseexpectedCall.from,
-          gas: baseexpectedCall.gas,
-        },
-      );
-      expect(result).toStrictEqual('0xabc16');
-    });
-
-    it(`should return ${SIMPLE_GAS_COST} if ethQuery.getCode does not return '0x'`, async () => {
-      expect(baseMockParams.estimateGasMethod.callCount).toStrictEqual(0);
-      const result = await estimateGasForSend({
-        ...baseMockParams,
-        to: '0x123',
-      });
-      expect(result).toStrictEqual(SIMPLE_GAS_COST);
-    });
-
-    it(`should return ${SIMPLE_GAS_COST} if not passed a sendToken or truthy to address`, async () => {
-      expect(baseMockParams.estimateGasMethod.callCount).toStrictEqual(0);
-      const result = await estimateGasForSend({ ...baseMockParams, to: null });
-      expect(result).toStrictEqual(SIMPLE_GAS_COST);
-    });
-
-    it(`should not return ${SIMPLE_GAS_COST} if passed a sendToken`, async () => {
-      expect(baseMockParams.estimateGasMethod.callCount).toStrictEqual(0);
-      const result = await estimateGasForSend({
-        ...baseMockParams,
-        to: '0x123',
-        sendToken: { address: '0x0' },
-      });
-      expect(result).not.toStrictEqual(SIMPLE_GAS_COST);
-    });
-
-    it(`should return ${BASE_TOKEN_GAS_COST} if passed a sendToken but no to address`, async () => {
-      const result = await estimateGasForSend({
-        ...baseMockParams,
-        to: null,
-        sendToken: { address: '0x0' },
-      });
-      expect(result).toStrictEqual(BASE_TOKEN_GAS_COST);
-    });
-
-    it(`should return the adjusted blockGasLimit if it fails with a 'Transaction execution error.'`, async () => {
-      const result = await estimateGasForSend({
-        ...baseMockParams,
-        to: 'isContract willFailBecauseOf:Transaction execution error.',
-      });
-      expect(result).toStrictEqual('0x64x0.95');
-    });
-
-    it(`should return the adjusted blockGasLimit if it fails with a 'gas required exceeds allowance or always failing transaction.'`, async () => {
-      const result = await estimateGasForSend({
-        ...baseMockParams,
-        to:
-          'isContract willFailBecauseOf:gas required exceeds allowance or always failing transaction.',
-      });
-      expect(result).toStrictEqual('0x64x0.95');
-    });
-
-    it(`should reject other errors`, async () => {
-      await expect(
-        estimateGasForSend({
-          ...baseMockParams,
-          to: 'isContract willFailBecauseOf:some other error',
-        }),
-      ).rejects.toThrow('some other error');
     });
   });
 
