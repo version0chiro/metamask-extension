@@ -1608,6 +1608,44 @@ describe('MetaMask', function () {
       await driver.findElement({ text: rpcUrl, tag: 'div' });
     });
 
+    it(`creates third custom RPC entry with chainId revalidation on url resubmit`, async function () {
+      const badRpcUrl = 'http://127.0.0.1:854/3';
+      const goodRpcUrl = 'http://127.0.0.1:8545/3';
+      const chainId = '0x539'; // Ganache default, decimal 1337
+
+      await driver.clickElement('.network-display');
+      await driver.delay(regularDelayMs);
+
+      await driver.clickElement({ text: 'Custom RPC', tag: 'span' });
+      await driver.delay(regularDelayMs);
+
+      await driver.findElement('.settings-page__sub-header-text');
+
+      const customRpcInputs = await driver.findElements('input[type="text"]');
+      const rpcUrlInput = customRpcInputs[1];
+      const chainIdInput = customRpcInputs[2];
+
+      // Enter incorrect RPC url
+      await rpcUrlInput.clear();
+      await rpcUrlInput.sendKeys(badRpcUrl);
+
+      await chainIdInput.clear();
+      await chainIdInput.sendKeys(chainId);
+
+      // Submit and wait for "Could not fetch chain ID error" text
+      await driver.clickElement('.network-form__footer .btn-secondary');
+      await driver.delay(regularDelayMs);
+
+      // Enter correct RPC url
+      await rpcUrlInput.clear();
+      await rpcUrlInput.sendKeys(goodRpcUrl);
+      await driver.delay(regularDelayMs);
+
+      // Successfully add network after updating RPC url
+      await driver.clickElement('.network-form__footer .btn-secondary');
+      await driver.findElement({ text: goodRpcUrl, tag: 'div' });
+    });
+
     it('selects another provider', async function () {
       await driver.clickElement('.network-display');
       await driver.delay(regularDelayMs);
